@@ -4,13 +4,6 @@
 #include "arithmetic.h"
 
 
-string s1[22] = { "+++", "1+--2", "*/1", "1*", "3/", "(1+5", "1-5)", "(1+2)3", "3*(**2)","((2+3" };
-
-string s2[5] = { "1+2+3-(3-2-1)", "-5", "(-5)", "-(-(-1*2.3/(4+5.5)))", "1.5*2.5" };
-
-double s3[5] = { 1 + 2 + 3 - (3 - 2 - 1), -5, (-5), -(-(-1 * 2.3 / (4 + 5.5))), 1.5 *2.5 };
-
-
 TEST(Lexem, can_create_lexem_val)
 {
 	Lexem L("2");
@@ -123,14 +116,76 @@ TEST(Arithmetic, can_divide_to_lexems)
 	EXPECT_EQ(12, A.GetValLexems(2));
 }
 
-TEST(Arithmetic, uncorrect_string)
+TEST(Arithmetic, uncorrect_string_1)
 {
-	for (int i = 0; i < 11; i++)
-	{
-		Arithmetic A(s1[i]);
-		A.DivideToLexems();
-		EXPECT_EQ(false, A.CheckBrackets() && A.CheckOperators());
-	}
+	Arithmetic A("+++");
+	A.DivideToLexems();
+	EXPECT_EQ(false, A.CheckBrackets() && A.CheckOperators());
+}
+
+TEST(Arithmetic, uncorrect_string_2)
+{
+	Arithmetic A("1+--2");
+	A.DivideToLexems();
+	EXPECT_EQ(false, A.CheckBrackets() && A.CheckOperators());
+}
+
+
+TEST(Arithmetic, uncorrect_string_3)
+{
+	Arithmetic A("*/1");
+	A.DivideToLexems();
+	EXPECT_EQ(false, A.CheckBrackets() && A.CheckOperators());
+}
+
+TEST(Arithmetic, uncorrect_string_4)
+{
+	Arithmetic A("1 * ");
+	A.DivideToLexems();
+	EXPECT_EQ(false, A.CheckBrackets() && A.CheckOperators());
+}
+
+TEST(Arithmetic, uncorrect_string_5)
+{
+	Arithmetic A( "3/");
+	A.DivideToLexems();
+	EXPECT_EQ(false, A.CheckBrackets() && A.CheckOperators());
+}
+
+TEST(Arithmetic, uncorrect_string_6)
+{
+	Arithmetic A("(1+5");
+	A.DivideToLexems();
+	EXPECT_EQ(false, A.CheckBrackets() && A.CheckOperators());
+}
+
+TEST(Arithmetic, uncorrect_string_7)
+{
+	Arithmetic A("1+5)");
+	A.DivideToLexems();
+	EXPECT_EQ(false, A.CheckBrackets() && A.CheckOperators());
+}
+
+TEST(Arithmetic, uncorrect_string_8)
+{
+	Arithmetic A("(1 + 2)3");
+	A.DivideToLexems();
+	EXPECT_EQ(false, A.CheckBrackets() && A.CheckOperators());
+}
+
+TEST(Arithmetic, uncorrect_string_9)
+{
+	Arithmetic A("3 * (**2)");
+	A.DivideToLexems();
+	EXPECT_EQ(false, A.CheckBrackets() && A.CheckOperators());
+}
+
+
+TEST(Arithmetic, uncorrect_string_10)
+{
+	Arithmetic A("((2 + 3");
+	A.DivideToLexems();
+	EXPECT_EQ(false, A.CheckBrackets() && A.CheckOperators());
 }
 
 
@@ -142,25 +197,63 @@ TEST(Arithmetic, check_points)
 }
 
 
-TEST(Arithmetic, correct_string)
+TEST(Arithmetic, correct_string_1)
 {
-	for (int i = 0; i < 5; i++)
-	{
-		Arithmetic A(s2[i]);
+		Arithmetic A("1+2+3-(3-2-1)");
 		A.DivideToLexems();
 		EXPECT_EQ(true, A.CheckBrackets() && A.CheckOperators());
-	}
+}
+
+TEST(Arithmetic, correct_string_2)
+{
+	Arithmetic A("-5");
+	A.DivideToLexems();
+	EXPECT_EQ(true, A.CheckBrackets() && A.CheckOperators());
+}
+
+
+TEST(Arithmetic, correct_string_3)
+{
+	Arithmetic A("1.5*2.5");
+	A.DivideToLexems();
+	EXPECT_EQ(true, A.CheckBrackets() && A.CheckOperators());
 }
 
  
-TEST(Arithmetic, can_calculate_2)
+TEST(Arithmetic, can_calculate_1)
 {
-	for (int i = 0; i < 5; i++)
-	{
-		Arithmetic A(s2[i]);
-		A.DivideToLexems();
-		A.PolishNotation();
-		EXPECT_EQ(s3[i], A.Calculate());
-	}
+	Arithmetic A("1+2+3-(3-2-1)");
+	A.DivideToLexems();
+	A.PolishNotation();
+	double res = A.Calculate();
+	EXPECT_EQ(6, res);
 }
 
+TEST(Arithmetic, can_calculate_2)
+{
+	Arithmetic A("-5");
+	A.DivideToLexems();
+	A.PolishNotation();
+	double res = A.Calculate();
+	EXPECT_EQ(-5, res);
+}
+
+TEST(Arithmetic, can_calculate_3)
+{
+	Arithmetic A("1.5*2.5");
+	A.DivideToLexems();
+	A.PolishNotation();
+	double res = A.Calculate();
+	EXPECT_EQ(3.75, res);
+}
+
+
+TEST(Arithmetic, minus_check)
+{
+	string s1 = "-2-3";
+	string s2 = "0-2-3";
+	string s3;
+	Arithmetic A("");
+	s3 = A.Minus(s1);
+	EXPECT_EQ(s2, s3);
+}
